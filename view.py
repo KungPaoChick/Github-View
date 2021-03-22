@@ -78,12 +78,12 @@ if __name__ == '__main__':
     colorama.init()
     url = 'https://github.com'
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
-                                     description="Clones all Public Repositories from Github Users.")
+                                     description="Views Public Repositories of Users")
 
     parser.add_argument('username',
                         nargs='+', metavar='USERNAMES',
                         action='store',
-                        help="Clones repositories from user/s. (e.g KungPaoChick uname2 uname3)")
+                        help="Views Public Repositories from the user/s. (e.g KungPaoChick uname2 uname3)")
 
     args = parser.parse_args()
 
