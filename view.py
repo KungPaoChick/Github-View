@@ -3,6 +3,7 @@ import argparse
 import colorama
 import os
 import csv
+import pandas as pd
 from bs4 import BeautifulSoup as soup
 
 
@@ -10,7 +11,7 @@ def repos(username, links):
     with open(os.path.join(name, f'{username}.csv'), 'w', encoding='utf-8') as f:
         headers = ['Link', 'Repository', 'Commits', 'Stars', 'Forks', 'Contributors']
         writer = csv.writer(f, dialect='excel')
-        
+
         writer.writerow(headers)
         print(colorama.Fore.YELLOW,
             f'[!] {name} has {len(links)} Public Repositor{plural_ies(len(links))}\n',
@@ -55,6 +56,11 @@ def repos(username, links):
             else:
                 my_data.append(con[-1])
             writer.writerows([my_data])
+
+    df = pd.read_csv(os.path.join(os.getcwd(), name, f'{username}.csv'))
+    pd.set_option('display.max_rows', None)
+    df.drop(['Link'], axis=1, inplace=True)
+    print(df)
 
 
 def plural_ies(v):
