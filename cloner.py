@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup as soup
 
 def repos(username, links):
     with open(os.path.join(name, f'{username}.csv'), 'w', encoding='utf-8') as f:
-        headers = ['Link', 'Repository', 'Stars', 'Forks', 'Contributors']
+        headers = ['Link', 'Repository', 'Commits', 'Stars', 'Forks', 'Contributors']
         writer = csv.writer(f, dialect='excel')
         
         writer.writerow(headers)
@@ -27,6 +27,9 @@ def repos(username, links):
                     f'[*] {repo_name.text}', colorama.Style.RESET_ALL)
                 my_data.append(repo_name.text)
 
+            # gets number of commits to the repository
+            my_data.append([x.text.split() for x in rep_soup.findAll('ul', {'class': 'list-style-none d-flex'})][0].pop(0))
+
             # gets description of the repository
             with open(os.path.join(name, f'{repo_name.text}.txt'), 'w') as repo_des:
                 abouts = {'None' : [x.text for x in rep_soup.findAll('div', {'class': 'f4 mt-3 color-text-secondary text-italic'})],
@@ -38,12 +41,10 @@ def repos(username, links):
                         repo_des.write(info)
 
             # gets star count
-            for star in [x.text.split() for x in rep_soup.findAll('a', {'href': f'{link.split(url)[1]}/stargazers'})].pop(0):
-                my_data.append(star)
+            my_data.append([star.text.split() for star in rep_soup.findAll('a', {'href': f'{link.split(url)[1]}/stargazers'})].pop(0)[0])
 
             # gets fork count
-            for fork in [x.text.split() for x in rep_soup.findAll('a', {'href': f'{link.split(url)[1]}/network/members'})].pop(0):
-                my_data.append(fork)
+            my_data.append([fork.text.split() for fork in rep_soup.findAll('a', {'href': f'{link.split(url)[1]}/network/members'})].pop(0)[0])
 
             con = []
             for contributor in [x['title'] for x in rep_soup.findAll('span', {'class': 'Counter'})]:
