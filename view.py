@@ -1,4 +1,3 @@
-from pynvim import encoding
 import requests
 import argparse
 import colorama
@@ -20,7 +19,7 @@ def repos(username, links):
               colorama.Style.RESET_ALL)
         for link in links:
             try:
-                with requests.get(link, timeout=1) as rep_response:
+                with requests.get(link) as rep_response:
                     rep_response.raise_for_status()
                     rep_soup = soup(rep_response.text, 'html.parser')
 
@@ -64,17 +63,17 @@ def repos(username, links):
                 writer.writerows([my_data])
             except requests.HTTPError as err:
                 print(colorama.Fore.RED,
-                      f'[!!] Something went wrong! {err}',
-                      colorama.Style.RESET_ALL)
+                    f'[!!] Something went wrong! {err}',
+                    colorama.Style.RESET_ALL)
 
-        return read_data(os.path.join(os.getcwd(), name), f'{username}.csv')
+    return read_data(os.path.join(os.getcwd(), name), f'{username}.csv')
 
 
 def read_data(path, filename):
-    df = pd.read_csv(os.path.join(path, filename), encoding='utf-8')
+    df = pd.read_csv(os.path.join(path, filename))
     pd.set_option('display.max_rows', None)
     df.drop(['Link'], axis=1, inplace=True)
-    print(df)
+    print(f'"{filename}" Data Frame:\n\n{df}')
 
 
 def plural_ies(v):
@@ -95,8 +94,8 @@ def conn(uname, main_url):
                 return repos(name.text, links)
     except requests.HTTPError as err:
         print(colorama.Fore.RED,
-              f'[!!] Something went wrong! {err}',
-              colorama.Style.RESET_ALL)
+            f'[!!] Something went wrong! {err}',
+            colorama.Style.RESET_ALL)
 
 
 if __name__ == '__main__':
