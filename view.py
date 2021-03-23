@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup as soup
 
 def repos(username, links):
     with open(os.path.join(name, f'{username}.csv'), 'w', encoding='utf-8') as f:
-        headers = ['Link', 'Repository', 'Default Branch', 'Commits', 
+        headers = ['Link', 'Repository', 'Commits', 
                    'Stars', 'Forks', 'Contributors']
         writer = csv.writer(f, dialect='excel')
 
@@ -29,10 +29,6 @@ def repos(username, links):
                     print(colorama.Fore.GREEN,
                           f'[*] {repo_name.text}', colorama.Style.RESET_ALL)
                     my_data.append(repo_name.text)
-
-                # gets default branch name
-                my_data.append([x.text for x in rep_soup.findAll(
-                    'span', {'class': 'css-truncate-target'})][0])
 
                 # gets number of commits to the repository
                 my_data.append([x.text.split() for x in rep_soup.findAll(
