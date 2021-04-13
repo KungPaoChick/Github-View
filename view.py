@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup as soup
 
 def repos(username, links):
     with open(os.path.join(name, f'{username}.csv'), 'w', encoding='utf-8') as f:
-        headers = ['Link', 'Repository', 'Commits', 
+        headers = ['Link', 'Repository', 'Commits',
                    'Stars', 'Forks', 'Contributors']
         writer = csv.writer(f, dialect='excel')
 
@@ -29,6 +29,8 @@ def repos(username, links):
                     print(colorama.Fore.GREEN,
                           f'[*] {repo_name.text}', colorama.Style.RESET_ALL)
                     my_data.append(repo_name.text)
+                    if args.clone:
+                        os.system(f'git clone {link}.git ~/Documents/{repo_name.text}')
 
                 # gets number of commits to the repository
                 my_data.append([x.text.split() for x in rep_soup.findAll(
@@ -91,7 +93,7 @@ def conn(uname, main_url):
                 links.append(f"{main_url}{repo['href']}")
 
             for name in page_soup.findAll('span', {'itemprop': 'name'}):
-                return repos(name.text, links)
+                return repos(''.join(name.text.split()), links)
     except requests.HTTPError as err:
         print(colorama.Fore.RED,
             f'[!!] Something went wrong! {err}',
@@ -104,14 +106,19 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter,
                                      description="Views Public Repositories of Users")
 
-    parser.add_argument('username',
+    parser.add_argument('-c', '--clone', nargs='+',
+                        metavar='CLONE', action='store',
+                        help="Clones and Views Public Repositories from the user/s. (e.g -c KungPaoChick uname2 uname3)")
+
+    parser.add_argument('-u', '--username',
                         nargs='+', metavar='USERNAMES',
                         action='store',
-                        help="Views Public Repositories from the user/s. (e.g KungPaoChick uname2 uname3)")
+                        help="Views Public Repositories from the user/s. (e.g -u KungPaoChick uname2 uname3)")
 
     args = parser.parse_args()
+    if args.clone or args.username:
+        for name in args.username or args.clone:
+            if not os.path.exists(name):
+                os.mkdir(name)
+            conn(name, url)
 
-    for name in args.username:
-        if not os.path.exists(name):
-            os.mkdir(name)
-        conn(name, url)
